@@ -17,6 +17,12 @@ app.use(
     allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
   }),
 );
+
+app.use("*", async (c, next) => {
+  await next();
+  c.header("Cache-Control", "no-store");
+});
+
 app.route("/", routes);
 app.onError(handleError);
 

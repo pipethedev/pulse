@@ -36,6 +36,7 @@ async function responseBody(res: Response): Promise<unknown> {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url(path), {
+    cache: "no-store",
     headers: { "Content-Type": "application/json" },
     ...init,
   });
