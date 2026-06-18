@@ -1,4 +1,5 @@
 import * as React from "react";
+import { toast } from "sonner";
 import { RefreshCw, ExternalLink, ImageOff, Maximize2, Trash2 } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,8 +32,11 @@ export function SiteCard({
   async function runCheck() {
     setChecking(true);
     try {
-      await api.runCheck(site.id);
+      const result = await api.runCheck(site.id);
+      toast.success(`${hostname(site.url)} is ${statusMeta(result.status).label.toLowerCase()}`);
       onChecked();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Check failed");
     } finally {
       setChecking(false);
     }
@@ -42,7 +46,10 @@ export function SiteCard({
     setDeleting(true);
     try {
       await api.deleteSite(site.id);
+      toast.success(`Removed ${hostname(site.url)}`);
       onDeleted();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete site");
     } finally {
       setDeleting(false);
     }

@@ -1,7 +1,9 @@
 import * as React from "react";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
+import { toast } from "sonner";
 import { Activity, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
 import { AddSiteDialog } from "@/components/add-site-dialog";
 import { SiteCard } from "@/components/site-card";
 import { api, type SiteWithLatestCheck } from "@/lib/api";
@@ -19,7 +21,9 @@ export default function App() {
       setSites(await api.listSites());
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load sites");
+      const message = err instanceof Error ? err.message : "Failed to load sites";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -72,7 +76,7 @@ export default function App() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-8">
-        {!loading && !error && sites.length > 0 && (
+        {!loading && sites.length > 0 && (
           <motion.p
             className="mb-6 text-sm text-muted-foreground"
             initial={{ opacity: 0 }}
@@ -88,7 +92,7 @@ export default function App() {
 
         {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
 
-        {error && (
+        {!loading && error && sites.length === 0 && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
           </div>
@@ -136,6 +140,7 @@ export default function App() {
           </motion.div>
         )}
       </main>
+      <Toaster position="bottom-right" />
     </div>
     </MotionConfig>
   );

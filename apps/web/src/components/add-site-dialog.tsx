@@ -1,4 +1,5 @@
 import * as React from "react";
+import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import {
   Dialog,
@@ -11,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
+import { hostname } from "@/lib/format";
 
 export function AddSiteDialog({ onAdded }: { onAdded: () => void }) {
   const [open, setOpen] = React.useState(false);
@@ -23,9 +25,11 @@ export function AddSiteDialog({ onAdded }: { onAdded: () => void }) {
     setSubmitting(true);
     setError(null);
     try {
-      await api.addSite(url.trim());
+      const trimmed = url.trim();
+      await api.addSite(trimmed);
       setUrl("");
       setOpen(false);
+      toast.success(`Now monitoring ${hostname(trimmed)}`);
       onAdded();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add site");

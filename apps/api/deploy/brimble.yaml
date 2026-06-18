@@ -12,6 +12,7 @@ services:
     healthcheck:
       path: /health
     env:
+      - CORS_ORIGINS
       - DATABASE_URL
       - BRIMBLE_SANDBOX_KEY
       - S3_ENDPOINT
