@@ -18,29 +18,19 @@ import { hostname, relativeTime, statusMeta } from "@/lib/format";
 
 export function SiteCard({
   site,
-  onChecked,
+  checkingId,
+  onCheck,
   onDeleted,
 }: {
   site: SiteWithLatestCheck;
-  onChecked: () => void;
+  checkingId: string | null;
+  onCheck: (site: SiteWithLatestCheck) => void;
   onDeleted: () => void;
 }) {
-  const [checking, setChecking] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
   const check = site.latestCheck;
-
-  async function runCheck() {
-    setChecking(true);
-    try {
-      const result = await api.runCheck(site.id);
-      toast.success(`${hostname(site.url)} is ${statusMeta(result.status).label.toLowerCase()}`);
-      onChecked();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Check failed");
-    } finally {
-      setChecking(false);
-    }
-  }
+  const checking = checkingId === site.id;
+  const anyChecking = checkingId !== null;
 
   async function deleteSite() {
     setDeleting(true);
@@ -132,8 +122,8 @@ export function SiteCard({
           variant="outline"
           size="sm"
           className="flex-1"
-          onClick={runCheck}
-          disabled={checking || deleting}
+          onClick={() => onCheck(site)}
+          disabled={anyChecking || deleting}
         >
           <RefreshCw className={checking ? "animate-spin" : undefined} />
           {checking ? "Checking…" : "Check now"}

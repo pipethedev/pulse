@@ -7,13 +7,14 @@ import { Toaster } from "@/components/ui/sonner";
 import { AddSiteDialog } from "@/components/add-site-dialog";
 import { SiteCard } from "@/components/site-card";
 import { api, type SiteWithLatestCheck } from "@/lib/api";
-import { statusMeta } from "@/lib/format";
+import { hostname, statusMeta } from "@/lib/format";
 import { cardVariants, gridVariants, soft } from "@/lib/motion";
 
 export default function App() {
   const [sites, setSites] = React.useState<SiteWithLatestCheck[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [checkingId, setCheckingId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   const load = React.useCallback(async () => {
@@ -37,6 +38,24 @@ export default function App() {
       setRefreshing(false);
     }
   }, [load]);
+
+  const runCheck = React.useCallback(
+    async (site: SiteWithLatestCheck) => {
+      setCheckingId(site.id);
+      try {
+        const result = await api.runCheck(site.id);
+        toast.success(
+          `${hostname(site.url)} is ${statusMeta(result.status).label.toLowerCase()}`,
+        );
+        await load();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Check failed");
+      } finally {
+        setCheckingId(null);
+      }
+    },
+    [load],
+  );
 
   React.useEffect(() => {
     void load();
@@ -132,7 +151,12 @@ export default function App() {
                   exit="exit"
                 >
                   <motion.div whileHover={{ y: -3 }} transition={soft}>
-                    <SiteCard site={site} onChecked={load} onDeleted={load} />
+                    <SiteCard
+                      site={site}
+                      checkingId={checkingId}
+                      onCheck={runCheck}
+                      onDeleted={load}
+                    />
                   </motion.div>
                 </motion.div>
               ))}
