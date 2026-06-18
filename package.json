@@ -4,7 +4,6 @@
   "description": "Visual uptime monitor — Brimble demo (API + dashboard)",
   "private": true,
   "type": "module",
-  "packageManager": "npm@10.9.2",
   "engines": {
     "node": ">=20"
   },
