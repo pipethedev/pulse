@@ -1,11 +1,22 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { allowedCorsOrigins } from "./config/cors.js";
 import { config } from "./config/index.js";
 import { routes } from "./api/routes.js";
 import { handleError } from "./api/error-handler.js";
 
 const app = new Hono();
+const corsOrigins = allowedCorsOrigins(config.CORS_ORIGINS);
 
+app.use(
+  "*",
+  cors({
+    origin: corsOrigins,
+    allowHeaders: ["Content-Type"],
+    allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
+  }),
+);
 app.route("/", routes);
 app.onError(handleError);
 

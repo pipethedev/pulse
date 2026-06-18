@@ -12,6 +12,7 @@ const schema = z.object({
   PUBLIC_ASSET_BASE_URL: z.string().url(),
   SANDBOX_TEMPLATE: z.string().default("node-22"),
   SANDBOX_REGION: z.string().default("auto"),
+  CORS_ORIGINS: z.string().default(""),
 });
 
 export type Config = z.infer<typeof schema>;
