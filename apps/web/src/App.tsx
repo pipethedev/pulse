@@ -1,10 +1,12 @@
 import * as React from "react";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { Activity, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AddSiteDialog } from "@/components/add-site-dialog";
 import { SiteCard } from "@/components/site-card";
 import { api, type SiteWithLatestCheck } from "@/lib/api";
 import { statusMeta } from "@/lib/format";
+import { cardVariants, gridVariants, soft } from "@/lib/motion";
 
 export default function App() {
   const [sites, setSites] = React.useState<SiteWithLatestCheck[]>([]);
@@ -29,6 +31,7 @@ export default function App() {
   const upCount = sites.filter((s) => s.latestCheck?.status === "up").length;
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
@@ -54,12 +57,17 @@ export default function App() {
 
       <main className="mx-auto max-w-6xl px-6 py-8">
         {!loading && !error && sites.length > 0 && (
-          <p className="mb-6 text-sm text-muted-foreground">
+          <motion.p
+            className="mb-6 text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={soft}
+          >
             Monitoring {sites.length} site{sites.length === 1 ? "" : "s"} ·{" "}
             <span className={statusMeta("up").variant === "success" ? "text-emerald-500" : ""}>
               {upCount} up
             </span>
-          </p>
+          </motion.p>
         )}
 
         {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
@@ -71,7 +79,12 @@ export default function App() {
         )}
 
         {!loading && !error && sites.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-20 text-center">
+          <motion.div
+            className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-20 text-center"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={soft}
+          >
             <Activity className="size-8 text-muted-foreground" />
             <div>
               <p className="font-medium">No sites yet</p>
@@ -80,22 +93,34 @@ export default function App() {
               </p>
             </div>
             <AddSiteDialog onAdded={load} />
-          </div>
+          </motion.div>
         )}
 
         {sites.length > 0 && (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {sites.map((site) => (
-              <SiteCard
-                key={site.id}
-                site={site}
-                onChecked={load}
-                onDeleted={load}
-              />
-            ))}
-          </div>
+          <motion.div
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+            variants={gridVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <AnimatePresence mode="popLayout">
+              {sites.map((site) => (
+                <motion.div
+                  key={site.id}
+                  layout
+                  variants={cardVariants}
+                  exit="exit"
+                >
+                  <motion.div whileHover={{ y: -3 }} transition={soft}>
+                    <SiteCard site={site} onChecked={load} onDeleted={load} />
+                  </motion.div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
       </main>
     </div>
+    </MotionConfig>
   );
 }
