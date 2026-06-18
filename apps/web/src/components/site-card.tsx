@@ -1,5 +1,5 @@
 import * as React from "react";
-import { RefreshCw, ExternalLink, ImageOff, Trash2 } from "lucide-react";
+import { RefreshCw, ExternalLink, ImageOff, Maximize2, Trash2 } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,12 +52,35 @@ export function SiteCard({
     <Card className="overflow-hidden">
       <div className="relative aspect-video border-b bg-muted">
         {site.screenshotUrl ? (
-          <img
-            src={site.screenshotUrl}
-            alt={`Screenshot of ${hostname(site.url)}`}
-            className="size-full object-cover object-top"
-            loading="lazy"
-          />
+          <Dialog>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className="group/preview block size-full cursor-zoom-in"
+                aria-label={`Preview screenshot of ${hostname(site.url)}`}
+              >
+                <img
+                  src={site.screenshotUrl}
+                  alt={`Screenshot of ${hostname(site.url)}`}
+                  className="size-full object-cover object-top"
+                  loading="lazy"
+                />
+                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-colors duration-200 group-hover/preview:bg-black/40 group-hover/preview:opacity-100">
+                  <Maximize2 className="size-6 text-white drop-shadow" />
+                </span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl overflow-hidden p-0">
+              <DialogTitle className="sr-only">
+                Screenshot of {hostname(site.url)}
+              </DialogTitle>
+              <img
+                src={site.screenshotUrl}
+                alt={`Screenshot of ${hostname(site.url)}`}
+                className="max-h-[85vh] w-full object-contain"
+              />
+            </DialogContent>
+          </Dialog>
         ) : (
           <div className="flex size-full flex-col items-center justify-center gap-2 text-muted-foreground">
             <ImageOff className="size-6" />
@@ -65,7 +88,7 @@ export function SiteCard({
           </div>
         )}
         {check && (
-          <div className="absolute right-3 top-3">
+          <div className="pointer-events-none absolute right-3 top-3">
             <Badge variant={statusMeta(check.status).variant}>
               {statusMeta(check.status).label}
             </Badge>

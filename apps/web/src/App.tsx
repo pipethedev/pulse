@@ -11,6 +11,7 @@ import { cardVariants, gridVariants, soft } from "@/lib/motion";
 export default function App() {
   const [sites, setSites] = React.useState<SiteWithLatestCheck[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const load = React.useCallback(async () => {
@@ -23,6 +24,15 @@ export default function App() {
       setLoading(false);
     }
   }, []);
+
+  const refresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await load();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [load]);
 
   React.useEffect(() => {
     void load();
@@ -47,8 +57,14 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => load()}>
-              <RefreshCw />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={refresh}
+              disabled={refreshing}
+              aria-label="Refresh"
+            >
+              <RefreshCw className={refreshing ? "animate-spin" : undefined} />
             </Button>
             <AddSiteDialog onAdded={load} />
           </div>
