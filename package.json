@@ -1,0 +1,21 @@
+{
+  "name": "pulse",
+  "version": "1.0.0",
+  "description": "Visual uptime monitor — Brimble demo (API + dashboard)",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@pulse/api",
+    "dev:web": "npm run dev --workspace=@pulse/web",
+    "build": "npm run build --workspaces --if-present",
+    "migrate": "npm run migrate --workspace=@pulse/api",
+    "worker": "npm run worker --workspace=@pulse/api",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}
