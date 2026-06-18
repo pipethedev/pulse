@@ -15,6 +15,7 @@ const CHECK_HISTORY_LIMIT = 50;
 
 export const routes = new Hono();
 
+routes.get("/", (c) => c.json({ status: "ok", message: "app is running" }));
 routes.get("/health", (c) => c.json({ status: "ok" }));
 
 routes.post("/sites", zValidator("json", createSiteSchema), async (c) => {
